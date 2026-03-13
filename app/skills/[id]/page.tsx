@@ -4,6 +4,7 @@ import { getSkillById, getRelatedSkills, skills } from "@/data/skills";
 import { Badge } from "@/components/ui/Badge";
 import { SkillGrid } from "@/components/SkillGrid";
 import { CopyButton } from "@/components/CopyButton";
+import { FavoriteButton } from "@/components/FavoriteButton";
 import { formatDate, formatNumber } from "@/lib/utils";
 import Link from "next/link";
 
@@ -84,11 +85,15 @@ export default async function SkillDetailPage({ params }: Props) {
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-3 flex-wrap">
                   <h1 className="text-2xl font-bold text-zinc-50">{skill.name}</h1>
-                  {skill.featured && (
-                    <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 flex-shrink-0">
-                      Featured
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    {skill.featured && (
+                      <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                        Featured
+                      </span>
+                    )}
+                    {/* Favorite toggle — client component embedded in server page */}
+                    <FavoriteButton skillId={skill.id} className="w-9 h-9" />
+                  </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 mt-2">
                   <Badge variant="category" category={skill.category}>

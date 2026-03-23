@@ -10,7 +10,8 @@ export type Category =
   | "Marketing"
   | "Data"
   | "Education"
-  | "Business";
+  | "Business"
+  | "AI";
 
 export interface Skill {
   id: string;

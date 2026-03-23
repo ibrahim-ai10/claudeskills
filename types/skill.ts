@@ -26,6 +26,9 @@ export interface Skill {
   imageUrl?: string;
   skillContent: string;
   createdAt: string;
+  videoUrl?: string;
+  demoGif?: string;
+  tutorialLength?: number;
 }
 
 export interface FilterState {

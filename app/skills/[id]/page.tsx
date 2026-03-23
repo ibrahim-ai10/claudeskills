@@ -4,6 +4,8 @@ import { getSkillById, getRelatedSkills, skills } from "@/data/skills";
 import { Badge } from "@/components/ui/Badge";
 import { SkillGrid } from "@/components/SkillGrid";
 import { CopyButton } from "@/components/CopyButton";
+import { VideoEmbed } from "@/components/VideoEmbed";
+import { SkillPreview } from "@/components/SkillPreview";
 import { formatDate, formatNumber } from "@/lib/utils";
 import Link from "next/link";
 
@@ -131,6 +133,16 @@ export default async function SkillDetailPage({ params }: Props) {
             </div>
           </div>
 
+          {/* Tutorial Video */}
+          {skill.videoUrl && (
+            <VideoEmbed videoUrl={skill.videoUrl} tutorialLength={skill.tutorialLength} />
+          )}
+
+          {/* Demo Preview */}
+          {!skill.videoUrl && skill.demoGif && (
+            <SkillPreview demoGif={skill.demoGif} name={skill.name} />
+          )}
+
           {/* Skill Prompt */}
           <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 overflow-hidden">
             <div className="flex items-center justify-between px-5 py-3.5 border-b border-zinc-800 bg-zinc-900">
@@ -226,6 +238,12 @@ export default async function SkillDetailPage({ params }: Props) {
               <div className="flex items-center justify-between text-sm">
                 <span className="text-zinc-500">Uses</span>
                 <span className="text-zinc-300">{formatNumber(skill.downloads)}</span>
+              </div>
+            )}
+            {skill.tutorialLength !== undefined && (
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-zinc-500">Tutorial</span>
+                <span className="text-zinc-300">{skill.tutorialLength} min video</span>
               </div>
             )}
             <div className="flex items-center justify-between text-sm">

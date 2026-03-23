@@ -34,8 +34,11 @@ export interface Skill {
 
 export interface FilterState {
   search: string;
-  category: Category | "All";
-  difficulty: Difficulty | "All";
+  /** Multi-select — empty array means "All" */
+  categories: Category[];
+  /** Multi-select — empty array means "All" */
+  difficulties: Difficulty[];
+  /** Multi-select tags — empty array means no tag filter */
   tags: string[];
   sort: "newest" | "popular" | "rating" | "name";
 }

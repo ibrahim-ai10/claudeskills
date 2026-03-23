@@ -14,6 +14,8 @@ export const skills: Skill[] = [
     downloads: 12400,
     featured: true,
     createdAt: "2024-11-01",
+    demoGif: "https://i.imgur.com/nWCGrBk.gif",
+    tutorialLength: 3,
     skillContent: `You are an expert resume coach and ATS optimization specialist. Your task is to help optimize a resume for a specific job application.
 
 When I provide my resume and a job description, you will:
@@ -47,6 +49,8 @@ Job description: [PASTE JOB DESCRIPTION HERE]`,
     downloads: 9800,
     featured: true,
     createdAt: "2024-11-05",
+    videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    tutorialLength: 5,
     skillContent: `You are a senior software engineer with 15+ years of experience across multiple languages and paradigms. Perform a thorough code review on the provided code.
 
 Analyze the code for:

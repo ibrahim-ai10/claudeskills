@@ -52,6 +52,7 @@ export function Footer() {
                 { href: "/skills?featured=true", label: "Featured" },
                 { href: "/about", label: "About" },
                 { href: "/about#submit", label: "Submit a Skill" },
+                { href: "/contact", label: "Contact" },
               ].map((link) => (
                 <li key={link.href}>
                   <Link

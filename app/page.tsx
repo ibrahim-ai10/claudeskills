@@ -3,6 +3,15 @@ import { featuredSkills, skills, stats } from "@/data/skills";
 import { SkillGrid } from "@/components/SkillGrid";
 import { CATEGORY_ICONS, CATEGORY_COLORS } from "@/lib/utils";
 
+// Derive a static "popularity score" from downloads + rating for server-side ordering
+const popularSkills = [...skills]
+  .sort((a, b) => {
+    const scoreA = (a.downloads ?? 0) * (a.rating ?? 4) * 0.01;
+    const scoreB = (b.downloads ?? 0) * (b.rating ?? 4) * 0.01;
+    return scoreB - scoreA;
+  })
+  .slice(0, 6);
+
 const CATEGORY_LIST = [
   { name: "Code", count: skills.filter((s) => s.category === "Code").length },
   { name: "Writing", count: skills.filter((s) => s.category === "Writing").length },
@@ -125,6 +134,32 @@ export default function HomePage() {
           </Link>
         </div>
         <SkillGrid skills={featuredSkills} variant="featured" />
+      </section>
+
+      {/* Popular Skills */}
+      <section className="border-t border-zinc-800/60 bg-zinc-900/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-2xl font-bold text-zinc-100">
+                🔥 Popular Skills
+              </h2>
+              <p className="text-zinc-500 text-sm mt-1">
+                Top-rated skills by the community
+              </p>
+            </div>
+            <Link
+              href="/skills?sort=popular"
+              className="text-sm text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1.5"
+            >
+              Sort by popular
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+          </div>
+          <SkillGrid skills={popularSkills} />
+        </div>
       </section>
 
       {/* Categories */}

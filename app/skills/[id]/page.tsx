@@ -4,6 +4,10 @@ import { getSkillById, getRelatedSkills, skills } from "@/data/skills";
 import { Badge } from "@/components/ui/Badge";
 import { SkillGrid } from "@/components/SkillGrid";
 import { CopyButton } from "@/components/CopyButton";
+import { RatingComponent } from "@/components/RatingComponent";
+import { ShareButton } from "@/components/ShareButton";
+import { SocialProofBadge } from "@/components/SocialProofBadge";
+import { ViewTracker } from "@/components/ViewTracker";
 import { formatDate, formatNumber } from "@/lib/utils";
 import Link from "next/link";
 
@@ -25,26 +29,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-function StarRating({ rating }: { rating: number }) {
-  return (
-    <div className="flex items-center gap-1">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <svg
-          key={star}
-          className={`w-4 h-4 ${
-            star <= Math.round(rating) ? "text-yellow-400" : "text-zinc-700"
-          }`}
-          fill="currentColor"
-          viewBox="0 0 20 20"
-        >
-          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-        </svg>
-      ))}
-      <span className="text-zinc-400 text-sm font-medium ml-1">{rating.toFixed(1)}</span>
-    </div>
-  );
-}
-
 export default async function SkillDetailPage({ params }: Props) {
   const { id } = await params;
   const skill = getSkillById(id);
@@ -52,9 +36,13 @@ export default async function SkillDetailPage({ params }: Props) {
   if (!skill) notFound();
 
   const related = getRelatedSkills(skill, 3);
+  const baseRating = skill.rating ?? 4.0;
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      {/* Track views client-side (invisible) */}
+      <ViewTracker skillId={skill.id} />
+
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-zinc-500 mb-8">
         <Link href="/" className="hover:text-zinc-300 transition-colors">Home</Link>
@@ -65,9 +53,10 @@ export default async function SkillDetailPage({ params }: Props) {
       </nav>
 
       <div className="grid lg:grid-cols-3 gap-8">
-        {/* Main content */}
+        {/* ── Main content ─────────────────────────────────────────────────── */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Header */}
+
+          {/* Header card */}
           <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/60">
             <div className="flex items-start gap-4 mb-4">
               <div className="w-12 h-12 rounded-xl bg-zinc-800 border border-zinc-700 flex items-center justify-center text-2xl flex-shrink-0">
@@ -84,11 +73,14 @@ export default async function SkillDetailPage({ params }: Props) {
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-3 flex-wrap">
                   <h1 className="text-2xl font-bold text-zinc-50">{skill.name}</h1>
-                  {skill.featured && (
-                    <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 flex-shrink-0">
-                      Featured
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    {skill.featured && (
+                      <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                        Featured
+                      </span>
+                    )}
+                    <ShareButton skillId={skill.id} skillName={skill.name} />
+                  </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 mt-2">
                   <Badge variant="category" category={skill.category}>
@@ -105,7 +97,15 @@ export default async function SkillDetailPage({ params }: Props) {
 
             {/* Stats row */}
             <div className="flex flex-wrap items-center gap-5 mt-5 pt-5 border-t border-zinc-800">
-              {skill.rating && <StarRating rating={skill.rating} />}
+              {/* Live rating badge (reads localStorage) */}
+              <SocialProofBadge
+                skillId={skill.id}
+                baseRating={baseRating}
+                baseDownloads={skill.downloads}
+                createdAt={skill.createdAt}
+                variant="full"
+              />
+
               {skill.downloads && (
                 <div className="flex items-center gap-1.5 text-zinc-500 text-sm">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -151,6 +151,16 @@ export default async function SkillDetailPage({ params }: Props) {
             </div>
           </div>
 
+          {/* Rating section */}
+          <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/60">
+            <h3 className="font-semibold text-zinc-100 mb-4">Rate this skill</h3>
+            <RatingComponent
+              skillId={skill.id}
+              baseRating={baseRating}
+              baseDownloads={skill.downloads}
+            />
+          </div>
+
           {/* Tags */}
           {skill.tags.length > 0 && (
             <div>
@@ -170,7 +180,7 @@ export default async function SkillDetailPage({ params }: Props) {
           )}
         </div>
 
-        {/* Sidebar */}
+        {/* ── Sidebar ───────────────────────────────────────────────────────── */}
         <div className="space-y-5">
           {/* Use with Claude CTA */}
           <div className="p-5 rounded-xl border border-blue-500/20 bg-blue-500/5">
@@ -191,18 +201,19 @@ export default async function SkillDetailPage({ params }: Props) {
             </a>
           </div>
 
-          {/* Share */}
+          {/* Share sidebar card */}
           <div className="p-5 rounded-xl border border-zinc-800 bg-zinc-900/60">
-            <h3 className="font-semibold text-zinc-100 mb-3">Share</h3>
-            <CopyButton
-              text={
-                typeof window !== "undefined"
-                  ? window.location.href
-                  : `https://claudeskills.com/skills/${skill.id}`
-              }
-              label="Copy link"
-              className="w-full justify-center"
-            />
+            <h3 className="font-semibold text-zinc-100 mb-3">Share this skill</h3>
+            <p className="text-zinc-500 text-xs mb-4 leading-relaxed">
+              Share with your team or on social media.
+            </p>
+            <div className="flex flex-col gap-2">
+              <ShareButton
+                skillId={skill.id}
+                skillName={skill.name}
+                className="w-full [&>button]:w-full [&>button]:justify-center"
+              />
+            </div>
           </div>
 
           {/* Quick info */}
@@ -216,12 +227,6 @@ export default async function SkillDetailPage({ params }: Props) {
               <span className="text-zinc-500">Difficulty</span>
               <Badge variant="difficulty" difficulty={skill.difficulty}>{skill.difficulty}</Badge>
             </div>
-            {skill.rating && (
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-zinc-500">Rating</span>
-                <span className="text-yellow-400 font-medium">{skill.rating}/5</span>
-              </div>
-            )}
             {skill.downloads && (
               <div className="flex items-center justify-between text-sm">
                 <span className="text-zinc-500">Uses</span>
